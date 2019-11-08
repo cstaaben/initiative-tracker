@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-content class="background: indigo lighten-5">
+    <v-content class="background: yellow lighten-4">
       <router-view name="header-top"></router-view>
       <router-view></router-view>
     </v-content>

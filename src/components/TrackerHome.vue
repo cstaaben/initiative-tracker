@@ -1,49 +1,56 @@
 <template>
   <v-container>
-    <v-layout text-center wrap>
-      <v-flex xs12>
-        <v-img
-          :src="require('../assets/dnd_logo.png')"
-          class="my-3"
-          contain
-          height="100"
-        ></v-img>
-      </v-flex>
+    <v-card outlined class="d-inline-block mx-auto">
+      <v-layout text-center wrap>
+        <v-flex xs12>
+          <v-img
+            :src="require('../assets/critical_role_outline.png')"
+            class="my-3"
+            contain
+            height="100"
+          ></v-img>
+        </v-flex>
 
-      <v-flex mb-4>
-        <h1 class="display-2 font-weight-bold mb-3">
-          Initiative Tracker for D&D 5e
-        </h1>
-      </v-flex>
+        <v-flex mb-4>
+          <h1 class="display-2 font-weight-bold mb-3">
+            Initiative Tracker for D&D 5e
+          </h1>
+        </v-flex>
 
-      <v-flex xs-12 mb-5>
-        <h2 class="headline font-weight-bold mb-3">What can I do?</h2>
-        <v-layout justify-center>
-          <v-list three-line elevation="2" dense>
-            <v-list-item
-              v-for="(ability, i) in abilities"
-              :key="ability.title"
-              :class="{ stripe: i % 2 != 0 }"
-            >
-              <v-list-item-avatar
-                ><v-icon v-text="ability.icon"></v-icon
-              ></v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title v-html="ability.content"></v-list-item-title>
-                <v-list-item-subtitle
-                  v-html="ability.subtitle"
-                ></v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-layout>
-      </v-flex>
-    </v-layout>
+        <v-flex xs-12 mb-5>
+          <h2 class="headline font-weight-bold mb-3">What can I do?</h2>
+          <v-layout justify-center>
+            <v-list three-line elevation="2" dense>
+              <v-list-item
+                v-for="(ability, i) in abilities"
+                :key="ability.title"
+                :class="{ stripe: i % 2 != 0 }"
+              >
+                <v-list-item-avatar
+                  ><v-icon
+                    v-text="ability.icon"
+                    color="light-blue darken-1"
+                  ></v-icon
+                ></v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-title
+                    v-html="ability.content"
+                  ></v-list-item-title>
+                  <v-list-item-subtitle
+                    v-html="ability.subtitle"
+                  ></v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+    </v-card>
   </v-container>
 </template>
 
 <script>
-import { mdiCheckboxMarkedOutline } from "@mdi/js";
+import { mdiCheckboxMarked } from "@mdi/js";
 
 export default {
   name: "TrackerHome",
@@ -55,7 +62,7 @@ export default {
           "Track all relevant information for all of your monsters, NPCs and PCs and save them for easy " +
           "re-use later.",
         title: "createCombatants",
-        icon: mdiCheckboxMarkedOutline
+        icon: mdiCheckboxMarked
       },
       {
         content: "Edit combatants",
@@ -64,7 +71,7 @@ export default {
           " rolls? We can handle that.<br> Need to update a combat-relevant stat for your PCs? Easy, peasey," +
           " lemon-squeezy.",
         title: "editCombatants",
-        icon: mdiCheckboxMarkedOutline
+        icon: mdiCheckboxMarked
       },
       {
         content: "Load combatants from previously created groups",
@@ -73,7 +80,7 @@ export default {
           "to throw at your players.<br> You can also load your characters straight into a list without having " +
           "to re-enter any information",
         title: "loadCombatants",
-        icon: mdiCheckboxMarkedOutline
+        icon: mdiCheckboxMarked
       },
       {
         content: "Save groups of combatants",
@@ -81,7 +88,7 @@ export default {
           "Need to prepare for a future encounter? Create a monster (or group of them) and add them to the " +
           "list of <br>combatants with your PC's for future use.",
         title: "saveCombatants",
-        icon: mdiCheckboxMarkedOutline
+        icon: mdiCheckboxMarked
       },
       {
         content: "Save an encounter",
@@ -90,7 +97,7 @@ export default {
           "dog, you)? We can do that. <br>Need to stop the session in the middle of the battle without losing " +
           "initiative order or current stats? We can do that too.",
         title: "saveEncounter",
-        icon: mdiCheckboxMarkedOutline
+        icon: mdiCheckboxMarked
       },
       {
         content: "Load an encounter",
@@ -99,14 +106,14 @@ export default {
           "of combatants with your <br>PC's for future use. Need to save the current list of combatants, preserving " +
           "current stats and initiative order? We do that too.",
         title: "loadEncounter",
-        icon: mdiCheckboxMarkedOutline
+        icon: mdiCheckboxMarked
       },
       {
         content: "Track initiative order",
         subtitle:
           "Oh, right. We do that too. Along with some other stats that could be useful in a pinch.",
         title: "trackInitiative",
-        icon: mdiCheckboxMarkedOutline
+        icon: mdiCheckboxMarked
       }
     ]
   })
