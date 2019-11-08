@@ -19,8 +19,12 @@
       <v-flex xs-12 mb-5>
         <h2 class="headline font-weight-bold mb-3">What can I do?</h2>
         <v-layout justify-center>
-          <v-list three-line>
-            <v-list-item v-for="ability in abilities" :key="ability.title">
+          <v-list three-line elevation="2" dense>
+            <v-list-item
+              v-for="(ability, i) in abilities"
+              :key="ability.title"
+              :class="{ stripe: i % 2 != 0 }"
+            >
               <v-list-item-avatar
                 ><v-icon v-text="ability.icon"></v-icon
               ></v-list-item-avatar>
@@ -109,4 +113,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.stripe {
+  background-color: #e8eaf6;
+}
+</style>
