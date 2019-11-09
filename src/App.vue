@@ -1,6 +1,7 @@
 <template>
   <v-app>
-    <v-content class="background: yellow lighten-4">
+    <!--    yellow lighten-4 -->
+    <v-content class="background: blue lighten-3">
       <router-view name="header-top"></router-view>
       <router-view></router-view>
     </v-content>

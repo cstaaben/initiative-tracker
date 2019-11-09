@@ -1,19 +1,27 @@
 <template>
   <v-container>
-    <v-app-bar app color="indigo" dark>
+    <v-app-bar app color="light-blue darken-4" dark>
       <v-app-bar-nav-icon @click.stop="menuShowing = !menuShowing" />
       <v-toolbar-title>{{ activePage }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu bottom left>
         <template v-slot:activator="{ on }">
           <v-btn dark icon v-on="on">
-            <v-icon v-text="optionsIcon"></v-icon>
+            <v-icon v-text="icons.options"></v-icon>
           </v-btn>
         </template>
 
         <v-list>
-          <v-list-item link>
-            <v-list-item-title>E-mail Corbin</v-list-item-title>
+          <v-list-item
+            link
+            v-for="optPage in optionPages"
+            :key="optPage.title"
+            :to="optPage.dest"
+          >
+            <v-list-item-icon
+              ><v-icon v-text="optPage.icon"></v-icon
+            ></v-list-item-icon>
+            <v-list-item-title>{{ optPage.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -49,6 +57,8 @@ import { mdiContentSave } from "@mdi/js";
 import { mdiCloudUploadOutline } from "@mdi/js";
 import { mdiHome } from "@mdi/js";
 import { mdiDotsVertical } from "@mdi/js";
+import { mdiEmail } from "@mdi/js";
+import { mdiSettings } from "@mdi/js";
 
 export default {
   name: "TrackerHeader",
@@ -87,7 +97,21 @@ export default {
         dest: "/load"
       }
     ],
-    optionsIcon: mdiDotsVertical
+    optionPages: [
+      {
+        title: "Options",
+        icon: mdiSettings,
+        dest: "/options"
+      },
+      {
+        title: "E-mail Corbin",
+        icon: mdiEmail,
+        dest: "/mail"
+      }
+    ],
+    icons: {
+      options: mdiDotsVertical
+    }
   })
 };
 </script>

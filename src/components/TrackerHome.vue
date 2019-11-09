@@ -1,8 +1,8 @@
 <template>
   <v-container>
-    <v-card outlined class="d-inline-block mx-auto">
+    <v-card outlined>
       <v-layout text-center wrap>
-        <v-flex xs12>
+        <v-flex class="xs12 lg12 align-center">
           <v-img
             :src="require('../assets/critical_role_outline.png')"
             class="my-3"
@@ -11,20 +11,20 @@
           ></v-img>
         </v-flex>
 
-        <v-flex mb-4>
-          <h1 class="display-2 font-weight-bold mb-3">
+        <v-flex class="xs12 lg12 align-center">
+          <h1 class="display-2 font-weight-bold mb-3 text-center">
             Initiative Tracker for D&D 5e
           </h1>
         </v-flex>
 
-        <v-flex xs-12 mb-5>
+        <v-flex class="xs12 lg12 align-center">
           <h2 class="headline font-weight-bold mb-3">What can I do?</h2>
           <v-layout justify-center>
-            <v-list three-line elevation="2" dense>
+            <v-list three-line dense elevation="0">
               <v-list-item
                 v-for="(ability, i) in abilities"
                 :key="ability.title"
-                :class="{ stripe: i % 2 != 0 }"
+                :class="{ stripe: i % 2 == 0 }"
               >
                 <v-list-item-avatar
                   ><v-icon
