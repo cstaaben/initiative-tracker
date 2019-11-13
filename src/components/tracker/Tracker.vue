@@ -29,7 +29,8 @@
               encounter.title
             }}</v-list-item-title>
             <v-list-item-subtitle
-              >Time Passed: {{ timePassed }}</v-list-item-subtitle
+              >Round: {{ encounter.round }} <br />
+              Time Passed: {{ timePassed }}</v-list-item-subtitle
             >
           </v-list-item-content>
         </v-list-item>
@@ -95,13 +96,18 @@
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-btn
-                @click="switchStarted"
-                :class="{
-                  success: !encounter.started,
-                  error: encounter.started
-                }"
+                @click="startEncounter"
+                class="success"
                 v-on="on"
-                ><v-icon v-text="encounterBtnIcon"></v-icon
+                v-show="!encounter.started"
+                ><v-icon v-text="icons.play"></v-icon
+              ></v-btn>
+              <v-btn
+                @click="stopEncounter"
+                class="error"
+                v-on="on"
+                v-show="encounter.started"
+                ><v-icon v-text="icons.stop"></v-icon
               ></v-btn>
             </template>
             <span v-if="!encounter.started">Start Encounter</span>
@@ -152,8 +158,8 @@ export default {
       encounter: mdiSwordCross,
       nextRound: mdiChevronRight,
       prevRound: mdiChevronLeft,
-      stopEncounter: mdiStop,
-      startEncoutner: mdiPlay,
+      stop: mdiStop,
+      play: mdiPlay,
       save: mdiContentSave
     },
     noCombatantsSnackbar: false,
@@ -192,24 +198,13 @@ export default {
         sortable: false
       }
     ],
-    scrollOptions: {
-      duration: 1000,
-      offset: 0,
-      easing: "linear",
-      container: "encounterTable"
-    }
   }),
   computed: {
     timePassed() {
-      let seconds = 0;
-      if (this.round <= 1) {
-        seconds = 0;
-      } else {
-        seconds = this.round * 6;
-      }
-
-      let minutes = seconds / 60;
-      let secRem = seconds % 60;
+      let seconds =
+        this.encounter.round <= 1 ? 0 : (this.encounter.round - 1) * 6;
+      let minutes = Math.floor(seconds / 60);
+      let secRem = Math.floor(seconds % 60);
 
       if (isNaN(minutes)) {
         minutes = "0";
@@ -219,7 +214,7 @@ export default {
       if (isNaN(secRem)) {
         secRem = "0";
       } else {
-        secRem = "0";
+        secRem = "" + secRem;
       }
 
       if (minutes.length == 1) {
@@ -230,11 +225,6 @@ export default {
       }
 
       return minutes + ":" + secRem;
-    },
-    encounterBtnIcon() {
-      return this.encounter.started
-        ? this.icons.stopEncounter
-        : this.icons.startEncoutner;
     }
   },
   methods: {
@@ -283,8 +273,21 @@ export default {
         return;
       }
 
+      if (!this.encounter.started && this.encounter.round == 0) {
+        this.encounter.round = 1;
+      }
+
       this.encounter.started = !this.encounter.started;
     },
+    startEncounter() {
+      if (this.encounter.combatants.length == 0) {
+        this.noCombatantsSnackbar = true;
+        return;
+      }
+
+
+    },
+    stopEncounter() {},
     previousTurn() {
       if (this.encounter.currentTurn == 0 && this.encounter.round == 0) {
         return;
@@ -301,6 +304,7 @@ export default {
       if (this.encounter.currentTurn == this.encounter.combatants.length - 1) {
         this.encounter.currentTurn = 0;
         this.encounter.round++;
+        return;
       }
 
       this.encounter.currentTurn++;
