@@ -43,14 +43,8 @@
         >
           <thead>
             <tr>
-              <th
-                v-for="header in dataHeaders"
-                :key="header.text"
-                :class="{
-                  'text-center': header.text == 'HP'
-                }"
-              >
-                {{ header.text }}
+              <th v-for="header in dataHeaders" :key="header">
+                {{ header }}
               </th>
             </tr>
           </thead>
@@ -65,8 +59,65 @@
             >
               <td>{{ combatant.name }}</td>
               <td>{{ combatant.initiative }}</td>
-              <td class="text-center">
-                {{ combatant.currentHP }}
+              <td class="justify-start">
+                <v-flex class="d-sm-inline-flex xs1 justify-start">
+                  {{ combatant.currentHP }}
+                </v-flex>
+                <v-flex class="d-sm-inline-flex offset-xs1 justify-end">
+                  <v-dialog
+                    v-model="dialogs.hp.show"
+                    persistent
+                    max-width="500"
+                  >
+                    <template #activator="{ on }">
+                      <v-btn @click="setDialogTarget(combatant)" v-on="on" small
+                        ><v-icon small v-text="icons.pencil"></v-icon
+                      ></v-btn>
+                    </template>
+
+                    <v-card dark>
+                      <v-card-title class="headline font-weight-light">
+                        <v-flex class="d-sm-inline-flex justify-start"
+                          >Modify Current HP for
+                          {{ getDialogTargetName }}</v-flex
+                        >
+                        <v-flex class="d-sm-inline-flex justify-end">
+                          <v-btn
+                            text
+                            fab
+                            dark
+                            small
+                            @click="dialogs.hp.show = false"
+                            ><v-icon small v-text="icons.close"></v-icon
+                          ></v-btn> </v-flex
+                      ></v-card-title>
+
+                      <v-card-text>
+                        <v-text-field v-model="dialogs.hp.modifier">
+                          <v-btn
+                            dark
+                            fab
+                            text
+                            color="success"
+                            slot="prepend"
+                            @click="modifyHP(dialogs.hp.modifier)"
+                            ><v-icon v-text="icons.plus"></v-icon>
+                          </v-btn>
+
+                          <v-btn
+                            dark
+                            fab
+                            text
+                            color="error"
+                            slot="append"
+                            @click="modifyHP(dialogs.hp.modifier * -1)"
+                            ><v-icon v-text="icons.minus"></v-icon>
+                          </v-btn>
+                        </v-text-field>
+                      </v-card-text>
+                    </v-card>
+                  </v-dialog>
+                </v-flex>
               </td>
               <td>{{ combatant.armorClass }}</td>
               <td>{{ combatant.passPerception }}</td>
@@ -102,17 +153,25 @@
                 v-show="!encounter.started"
                 ><v-icon v-text="icons.play"></v-icon
               ></v-btn>
-              <v-btn
-                @click="stopEncounter"
-                class="error"
-                v-on="on"
-                v-show="encounter.started"
-                ><v-icon v-text="icons.stop"></v-icon
-              ></v-btn>
             </template>
-            <span v-if="!encounter.started">Start Encounter</span>
-            <span v-else>Stop Encounter</span>
+            <span>Start Encounter</span>
           </v-tooltip>
+
+          <v-dialog persistent v-model="dialogs.endCombat.show" max-width="350">
+            <template #activator="{ on }">
+              <tracker-tooltip-btn
+                :click-action="stopEncounter"
+                :icon="icons.stop"
+                :showing="encounter.started"
+                :btn-class="'error'"
+              ></tracker-tooltip-btn>
+            </template>
+            <v-card dark>
+              <v-btn @click="dialogs.endCombat.show = false"
+                ><v-icon v-text="icons.close"></v-icon
+              ></v-btn>
+            </v-card>
+          </v-dialog>
 
           <v-tooltip top>
             <template v-slot:activator="{ on }">
@@ -144,15 +203,25 @@
 </template>
 
 <script>
-import { mdiSwordCross } from "@mdi/js";
-import { mdiChevronRight } from "@mdi/js";
-import { mdiChevronLeft } from "@mdi/js";
-import { mdiStop } from "@mdi/js";
-import { mdiPlay } from "@mdi/js";
-import { mdiContentSave } from "@mdi/js";
+import TrackerTooltipBtn from "./TrackerTooltipBtn.vue";
+import {
+  mdiSwordCross,
+  mdiChevronRight,
+  mdiChevronLeft,
+  mdiStop,
+  mdiPlay,
+  mdiContentSave,
+  mdiPencil,
+  mdiClose,
+  mdiPlus,
+  mdiMinus
+} from "@mdi/js";
 
 export default {
   name: "Tracker",
+  components: {
+    "tracker-tooltip-btn": TrackerTooltipBtn
+  },
   data: () => ({
     icons: {
       encounter: mdiSwordCross,
@@ -160,9 +229,24 @@ export default {
       prevRound: mdiChevronLeft,
       stop: mdiStop,
       play: mdiPlay,
-      save: mdiContentSave
+      save: mdiContentSave,
+      pencil: mdiPencil,
+      close: mdiClose,
+      plus: mdiPlus,
+      minus: mdiMinus
     },
     noCombatantsSnackbar: false,
+    dialogs: {
+      hp: {
+        show: false,
+        modifier: null,
+        combatant: null
+      },
+      endCombat: {
+        show: false,
+        preserveRound: true
+      }
+    },
     encounter: {
       title: "Encounter",
       started: false,
@@ -170,34 +254,7 @@ export default {
       currentTurn: 0,
       combatants: []
     },
-    dataHeaders: [
-      {
-        text: "Name",
-        align: "left",
-        sortable: false,
-        value: "name"
-      },
-      {
-        text: "Initiative",
-        value: "initiative",
-        sortable: false
-      },
-      {
-        text: "HP",
-        value: "currentHP",
-        sortable: false
-      },
-      {
-        text: "AC",
-        value: "armorClass",
-        sortable: false
-      },
-      {
-        text: "Passive Perception",
-        value: "passPerception",
-        sortable: false
-      }
-    ],
+    dataHeaders: ["Name", "Initiative", "HP", "AC", "Passive Perception"]
   }),
   computed: {
     timePassed() {
@@ -225,6 +282,11 @@ export default {
       }
 
       return minutes + ":" + secRem;
+    },
+    getDialogTargetName() {
+      return this.dialogs.hp.combatant == null
+        ? ""
+        : this.dialogs.hp.combatant.name;
     }
   },
   methods: {
@@ -267,27 +329,20 @@ export default {
 
       return 0;
     },
-    switchStarted() {
-      if (!this.encounter.started && this.encounter.combatants.length == 0) {
-        this.noCombatantsSnackbar = true;
-        return;
-      }
-
-      if (!this.encounter.started && this.encounter.round == 0) {
-        this.encounter.round = 1;
-      }
-
-      this.encounter.started = !this.encounter.started;
-    },
     startEncounter() {
       if (this.encounter.combatants.length == 0) {
         this.noCombatantsSnackbar = true;
         return;
+      } else if (!this.encounter.started) {
+        this.encounter.round = 1;
       }
 
-
+      this.encounter.started = true;
     },
-    stopEncounter() {},
+    stopEncounter() {
+      this.encounter.started = false;
+      this.dialogs.endCombat.show = true;
+    },
     previousTurn() {
       if (this.encounter.currentTurn == 0 && this.encounter.round == 0) {
         return;
@@ -308,6 +363,14 @@ export default {
       }
 
       this.encounter.currentTurn++;
+    },
+    setDialogTarget(combatant) {
+      this.dialogs.hp.combatant = combatant;
+    },
+    modifyHP(modifier) {
+      this.dialogs.hp.combatant.currentHP += parseInt(modifier);
+      this.dialogs.hp.show = false;
+      this.dialogs.hp.modifier = null;
     }
   }
 };
