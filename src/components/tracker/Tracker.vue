@@ -167,9 +167,37 @@
               ></tracker-tooltip-btn>
             </template>
             <v-card dark>
-              <v-btn @click="dialogs.endCombat.show = false"
-                ><v-icon v-text="icons.close"></v-icon
-              ></v-btn>
+              <v-card-title class="subtitle-1">
+                Preserve Round And Turn?
+              </v-card-title>
+
+              <v-card-subtitle class="overline justify-center"
+                >Choosing 'No' will reset round count to 1 and lose current
+                turn</v-card-subtitle
+              >
+
+              <v-card-text>
+                <v-flex class="d-inline-flex">
+                  <v-btn
+                    color="success"
+                    text
+                    dark
+                    large
+                    @click="dialogs.endCombat.show = false"
+                    >Yes</v-btn
+                  >
+                </v-flex>
+                <v-flex class="d-inline-flex">
+                  <v-btn
+                    color="error"
+                    text
+                    dark
+                    large
+                    @click="resetRoundAndTurn"
+                    >No</v-btn
+                  >
+                </v-flex>
+              </v-card-text>
             </v-card>
           </v-dialog>
 
@@ -244,7 +272,7 @@ export default {
       },
       endCombat: {
         show: false,
-        preserveRound: true
+        preserveRoundTurn: true
       }
     },
     encounter: {
@@ -333,7 +361,7 @@ export default {
       if (this.encounter.combatants.length == 0) {
         this.noCombatantsSnackbar = true;
         return;
-      } else if (!this.encounter.started) {
+      } else if (!this.encounter.started && this.encounter.round == 0) {
         this.encounter.round = 1;
       }
 
@@ -371,6 +399,11 @@ export default {
       this.dialogs.hp.combatant.currentHP += parseInt(modifier);
       this.dialogs.hp.show = false;
       this.dialogs.hp.modifier = null;
+    },
+    resetRoundAndTurn() {
+      this.encounter.round = 0;
+      this.encounter.currentTurn = 0;
+      this.dialogs.endCombat.show = false;
     }
   }
 };
