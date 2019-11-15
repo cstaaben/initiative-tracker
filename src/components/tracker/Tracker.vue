@@ -131,31 +131,21 @@
 
       <v-card-actions>
         <v-flex class="justify-end d-inline-flex">
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-show="encounter.started"
-                class="info"
-                @click="previousTurn"
-                v-on="on"
-                ><v-icon v-text="icons.prevRound"></v-icon
-              ></v-btn>
-            </template>
-            <span>Previous Turn</span>
-          </v-tooltip>
+          <tracker-tooltip-btn
+            :showing="encounter.started"
+            :class="'info'"
+            :click-action="previousTurn"
+            :icon="icons.prevRound"
+            >Previous Turn</tracker-tooltip-btn
+          >
 
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                @click="startEncounter"
-                class="success"
-                v-on="on"
-                v-show="!encounter.started"
-                ><v-icon v-text="icons.play"></v-icon
-              ></v-btn>
-            </template>
-            <span>Start Encounter</span>
-          </v-tooltip>
+          <tracker-tooltip-btn
+            :click-action="startEncounter"
+            :class="'success'"
+            :showing="!encounter.started"
+            :icon="icons.play"
+            >Start Encounter</tracker-tooltip-btn
+          >
 
           <v-dialog persistent v-model="dialogs.endCombat.show" max-width="350">
             <template #activator="{ on }">
@@ -164,8 +154,10 @@
                 :icon="icons.stop"
                 :showing="encounter.started"
                 :btn-class="'error'"
-              ></tracker-tooltip-btn>
+                >Stop Encounter</tracker-tooltip-btn
+              >
             </template>
+
             <v-card dark>
               <v-card-title class="subtitle-1">
                 Preserve Round And Turn?
@@ -201,29 +193,22 @@
             </v-card>
           </v-dialog>
 
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-show="encounter.started"
-                class="info"
-                @click="nextTurn"
-                v-on="on"
-                ><v-icon v-text="icons.nextRound"></v-icon
-              ></v-btn>
-            </template>
-            <span>Next Turn</span>
-          </v-tooltip>
+          <tracker-tooltip-btn
+            :btn-class="'info'"
+            :click-action="nextTurn"
+            :showing="encounter.started"
+            :icon="icons.nextRound"
+            >Next Turn</tracker-tooltip-btn
+          >
         </v-flex>
 
         <v-flex class="justify-end d-inline-flex">
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-btn v-on="on" :disabled="encounter.combatants.length == 0"
-                ><v-icon v-text="icons.save"></v-icon
-              ></v-btn>
-            </template>
-            <span>Save Encounter</span>
-          </v-tooltip>
+          <tracker-tooltip-btn
+            :click-action="saveEncounter"
+            :icon="icons.save"
+            :showing="true"
+            >Save Encounter</tracker-tooltip-btn
+          >
         </v-flex>
       </v-card-actions>
     </v-card>
@@ -404,6 +389,9 @@ export default {
       this.encounter.round = 0;
       this.encounter.currentTurn = 0;
       this.dialogs.endCombat.show = false;
+    },
+    saveEncounter() {
+      console.log("saving encounter");
     }
   }
 };

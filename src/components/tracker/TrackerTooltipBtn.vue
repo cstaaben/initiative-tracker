@@ -5,7 +5,7 @@
         ><v-icon v-text="icon"></v-icon
       ></v-btn>
     </template>
-    <span>Stop Encounter</span>
+    <span><slot></slot></span>
   </v-tooltip>
 </template>
 
