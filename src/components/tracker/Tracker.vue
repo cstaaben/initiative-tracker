@@ -133,7 +133,7 @@
         <v-flex class="justify-end d-inline-flex">
           <tracker-tooltip-btn
             :showing="encounter.started"
-            :class="'info'"
+            :btn-class="'info'"
             :click-action="previousTurn"
             :icon="icons.prevRound"
             >Previous Turn</tracker-tooltip-btn
@@ -141,7 +141,7 @@
 
           <tracker-tooltip-btn
             :click-action="startEncounter"
-            :class="'success'"
+            :btn-class="'success'"
             :showing="!encounter.started"
             :icon="icons.play"
             >Start Encounter</tracker-tooltip-btn

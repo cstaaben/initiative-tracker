@@ -57,6 +57,10 @@ const routes = [
     components: {
       "header-top": TrackerHeader
     }
+  },
+  {
+    path: "*",
+    redirect: "/"
   }
 ];
 
