@@ -94,7 +94,7 @@
               <td>
                 <tracker-tooltip-btn
                   :btn-class="'info'"
-                  :click-action="function() {}"
+                  :click-action="function() { editCombatant(combatant.id); }"
                   :icon="icons.edit"
                   :showing="true"
                   >Edit Combatant</tracker-tooltip-btn
@@ -285,6 +285,9 @@ export default {
     },
     toggleEditTitle() {
       this.editTitle = !this.editTitle;
+    },
+    editCombatant(id) {
+      console.log("TODO: navigate to edit combatant " + id);
     }
   }
 };
