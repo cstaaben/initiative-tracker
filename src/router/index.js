@@ -1,3 +1,4 @@
+import CombatantList from "../components/combatants/CombatantList.vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import TrackerHome from "../components/TrackerHome.vue";
@@ -27,8 +28,25 @@ const routes = [
     path: "/combatants",
     name: "combatants",
     components: {
-      "header-top": TrackerHeader
-    }
+      "header-top": TrackerHeader,
+      default: CombatantList
+    },
+    children: [
+      {
+        path: "add",
+        name: "add-combatants",
+        components: {
+          "header-top": TrackerHeader
+        }
+      },
+      {
+        path: ":id/edit",
+        name: "edit-combatant",
+        components: {
+          "header-top": TrackerHeader
+        }
+      }
+    ]
   },
   {
     path: "/save",

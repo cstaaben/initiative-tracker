@@ -51,7 +51,7 @@
           <tbody>
             <tr
               v-for="(combatant, i) in encounter.combatants"
-              :key="combatant.name"
+              :key="combatant.id"
               :class="{
                 yellow: encounter.currentTurn == i && encounter.started,
                 'accent-3': encounter.currentTurn == i && encounter.started
