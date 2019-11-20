@@ -49,19 +49,21 @@
         </v-flex>
 
         <v-flex class="d-sm-inline-flex">
-          <v-btn v-show="editTitle" @click="editTitle = false" class="success"
-            ><v-icon v-text="icons.check"></v-icon
-          ></v-btn>
-        </v-flex>
+          <tracker-tooltip-btn
+            :showing="!editTitle"
+            :click-action="toggleEditTitle"
+            :icon="icons.edit"
+            :btn-class="'info'"
+            >Edit Details</tracker-tooltip-btn
+          >
 
-        <v-flex class="d-sm-inline-flex">
-          <v-btn
-            v-show="!editTitle"
-            @click="editTitle = true"
-            class="white--text"
-            color="light-blue accent-2"
-            ><v-icon v-text="icons.edit"></v-icon
-          ></v-btn>
+          <tracker-tooltip-btn
+            :showing="editTitle"
+            :click-action="toggleEditTitle"
+            :btn-class="'success'"
+            :icon="icons.check"
+            >Set Details</tracker-tooltip-btn
+          >
         </v-flex>
 
         <v-simple-table
@@ -115,21 +117,33 @@
       </v-card-text>
 
       <v-card-actions class="justify-center">
-        <v-btn class="success d-sm-inline-flex"
-          ><v-icon v-text="icons.plus"></v-icon
-        ></v-btn>
+        <tracker-tooltip-btn
+          :showing="true"
+          :click-action="function() {}"
+          :btn-class="'success'"
+          :icon="icons.plus"
+          >Add Combatant</tracker-tooltip-btn
+        >
 
-        <v-btn
-          class="primary d-sm-inline-flex"
-          v-if="encounter.combatants.length > 0 || encounter.title.length > 0"
-          ><v-icon v-text="icons.save"></v-icon
-        ></v-btn>
+        <tracker-tooltip-btn
+          :showing="
+            encounter.combatants.length > 0 || encounter.title.length > 0
+          "
+          :click-action="function() {}"
+          :btn-class="'primary'"
+          :icon="icons.save"
+          >Save Encounter</tracker-tooltip-btn
+        >
 
-        <v-btn
-          class="primary d-sm-inline-flex"
-          v-if="encounter.combatants.length == 0 && encounter.title.length == 0"
-          ><v-icon v-text="icons.load"></v-icon
-        ></v-btn>
+        <tracker-tooltip-btn
+          :showing="
+            encounter.combatants.length == 0 && encounter.title.length == 0
+          "
+          :click-action="function() {}"
+          :btn-class="'primary'"
+          :icon="icons.load"
+          >Load Encounter</tracker-tooltip-btn
+        >
       </v-card-actions>
     </v-card>
   </v-container>
@@ -209,6 +223,9 @@ export default {
         this.dialogs.removeConfirm.targetIndex,
         1
       );
+    },
+    toggleEditTitle() {
+      this.editTitle = !this.editTitle;
     }
   }
 };
