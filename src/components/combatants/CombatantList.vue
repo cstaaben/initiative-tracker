@@ -99,13 +99,41 @@
                   :showing="true"
                   >Edit Combatant</tracker-tooltip-btn
                 >
-                <tracker-tooltip-btn
-                  :click-action="removeCombatant"
-                  :btn-class="'error'"
-                  :icon="icons.delete"
-                  :showing="true"
-                  >Remove Combatant</tracker-tooltip-btn
+
+                <v-dialog
+                  v-model="dialogs.removeConfirmation.showing"
+                  max-width="650"
+                  persistent
                 >
+                  <template #activator="{ on }">
+                    <v-tooltip top v-on="on">
+                      <template #activator="{ on }">
+                        <v-btn
+                          @click="toggleAndSetRemoveTarget(i)"
+                          class="error"
+                          v-on="on"
+                          ><v-icon v-text="icons.delete"></v-icon
+                        ></v-btn>
+                      </template>
+                      <span>Remove Combatant</span>
+                    </v-tooltip>
+                  </template>
+
+                  <v-card dark>
+                    <v-card-title class="headline font-weight-light">
+                      Remove {{ removeTargetName }} from {{ encounterTitle }}?
+                    </v-card-title>
+
+                    <v-card-text>
+                      <v-btn dark text color="success" @click="removeCombatant"
+                        >Yes</v-btn
+                      >
+                      <v-btn dark text color="error" @click="toggleRemoveDialog"
+                        >No</v-btn
+                      >
+                    </v-card-text>
+                  </v-card>
+                </v-dialog>
               </td>
             </tr>
           </tbody>
@@ -186,11 +214,28 @@ export default {
     },
     editTitle: false,
     dialogs: {
-      removeConfirm: {
-        targetIndex: -1
+      removeConfirmation: {
+        targetIndex: -1,
+        showing: false
       }
     }
   }),
+  computed: {
+    removeTargetName() {
+      if (this.dialogs.removeConfirmation.targetIndex < 0) {
+        return "";
+      }
+
+      return this.encounter.combatants[
+        this.dialogs.removeConfirmation.targetIndex
+      ].name;
+    },
+    encounterTitle() {
+      return this.encounter.title.length > 0
+        ? this.encounter.title
+        : " the encounter";
+    }
+  },
   methods: {
     initTestCombatants() {
       if (this.encounter.combatants.length > 0) {
@@ -215,14 +260,28 @@ export default {
         this.encounter.combatants.push(c);
       }
     },
+    toggleRemoveDialog() {
+      this.dialogs.removeConfirmation.showing = !this.dialogs.removeConfirmation
+        .showing;
+    },
+    setRemoveTarget(index) {
+      this.dialogs.removeConfirmation.targetIndex = index;
+    },
+    toggleAndSetRemoveTarget(index) {
+      this.toggleRemoveDialog();
+      this.setRemoveTarget(index);
+    },
     removeCombatant() {
-      if (this.dialogs.removeConfirm.targetIndex == -1) {
+      if (this.dialogs.removeConfirmation.targetIndex == -1) {
         return;
       }
-      this.encounter.combatants = this.encounter.combatants.splice(
-        this.dialogs.removeConfirm.targetIndex,
+
+      this.encounter.combatants.splice(
+        this.dialogs.removeConfirmation.targetIndex,
         1
       );
+
+      this.toggleRemoveDialog();
     },
     toggleEditTitle() {
       this.editTitle = !this.editTitle;
