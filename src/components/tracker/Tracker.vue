@@ -130,7 +130,7 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-flex class="justify-end d-inline-flex">
+        <v-flex class="justify-center d-inline-flex">
           <tracker-tooltip-btn
             :showing="encounter.started"
             :btn-class="'info'"
@@ -199,15 +199,6 @@
             :showing="encounter.started"
             :icon="icons.nextRound"
             >Next Turn</tracker-tooltip-btn
-          >
-        </v-flex>
-
-        <v-flex class="justify-end d-inline-flex">
-          <tracker-tooltip-btn
-            :click-action="saveEncounter"
-            :icon="icons.save"
-            :showing="true"
-            >Save Encounter</tracker-tooltip-btn
           >
         </v-flex>
       </v-card-actions>

@@ -79,10 +79,10 @@ export default {
         dest: "/tracker"
       },
       {
-        title: "Combatants",
-        navTitle: "Combatants",
+        title: "Encounter",
+        navTitle: "Encounter",
         icon: mdiAccountGroup,
-        dest: "/combatants"
+        dest: "/encounter"
       },
       {
         title: "Save Encounter",

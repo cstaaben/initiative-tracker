@@ -1,20 +1,8 @@
 <template>
   <v-container>
     <v-card outlined elevation="1">
-      <v-toolbar elevation="0">
-        <v-btn class="primary" @click="initTestCombatants"
-          >Add Test Combatants</v-btn
-        >
-        <v-btn
-          class="error"
-          @click="encounter.combatants = []"
-          v-if="encounter.combatants.length > 0"
-          >Remove Combatants</v-btn
-        >
-      </v-toolbar>
-
       <v-card-title>
-        <v-list-item two-line>
+        <v-list-item>
           <v-list-item-avatar left
             ><v-icon v-text="icons.combatants"></v-icon
           ></v-list-item-avatar>
@@ -147,7 +135,7 @@
       <v-card-actions class="justify-center">
         <tracker-tooltip-btn
           :showing="true"
-          :click-action="function() {}"
+          :click-action="navigateToAddCombatant"
           :btn-class="'success'"
           :icon="icons.plus"
           >Add Combatant</tracker-tooltip-btn
@@ -288,6 +276,9 @@ export default {
     },
     editCombatant(id) {
       console.log("TODO: navigate to edit combatant " + id);
+    },
+    navigateToAddCombatant() {
+      this.$router.push({ name: "add-combatant" });
     }
   }
 };
