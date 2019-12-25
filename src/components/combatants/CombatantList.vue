@@ -8,7 +8,7 @@
           ></v-list-item-avatar>
           <v-list-item-content
             ><v-list-item-title class="headline mb-1"
-              >Combatants</v-list-item-title
+              >{{ title }}</v-list-item-title
             ></v-list-item-content
           >
         </v-list-item>
@@ -183,6 +183,7 @@ export default {
     "tracker-tooltip-btn": TrackerTooltipBtn
   },
   data: () => ({
+    title: "Encounter",
     icons: {
       combatants: mdiAccountGroup,
       save: mdiContentSave,
