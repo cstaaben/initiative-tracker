@@ -1,32 +1,52 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
-  </div>
+  <v-app>
+    <v-main class="background: blue lighten-3">
+      <router-view name="header-top"></router-view>
+      <transition name="slide" mode="out-in">
+        <router-view></router-view>
+      </transition>
+    </v-main>
+  </v-app>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+export default {
+  name: "InitiativeTracker",
+  data: () => ({})
+};
+</script>
+
+<style scoped>
+.slide-leave-active {
+  transition: opacity 400ms ease;
+  opacity: 0;
+  animation: slide-out 400ms ease-out forwards;
 }
 
-#nav {
-  padding: 30px;
+.slide-leave {
+  opacity: 1;
+  transform: translateX(0);
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+.slide-enter-active {
+  animation: slide-in 400ms ease-out forwards;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+@keyframes slide-out {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(30px);
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(30px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
 </style>

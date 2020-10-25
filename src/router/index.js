@@ -1,6 +1,10 @@
+import CombatantList from "../components/combatants/CombatantList.vue";
+import CombatantForm from "../components/combatants/CombatantForm.vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import TrackerHome from "../components/TrackerHome.vue";
+import TrackerHeader from "../components/shared/TrackerHeader.vue";
+import Tracker from "../components/tracker/Tracker.vue";
 
 Vue.use(VueRouter);
 
@@ -8,16 +12,74 @@ const routes = [
   {
     path: "/",
     name: "home",
-    component: Home
+    components: {
+      default: TrackerHome,
+      "header-top": TrackerHeader
+    }
   },
   {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
+    path: "/tracker",
+    name: "tracker",
+    components: {
+      "header-top": TrackerHeader,
+      default: Tracker
+    }
+  },
+  {
+    path: "/encounter",
+    name: "encounter",
+    components: {
+      "header-top": TrackerHeader,
+      default: CombatantList
+    }
+  },
+  {
+    path: "/encounter/combatants/add",
+    name: "add-combatant",
+    components: {
+      "header-top": TrackerHeader,
+      default: CombatantForm
+    }
+  },
+  {
+    path: "/encounter/combatants/:id/edit",
+    name: "edit-combatant",
+    components: {
+      "header-top": TrackerHeader,
+      default: CombatantForm
+    }
+  },
+  {
+    path: "/save",
+    name: "save",
+    components: {
+      "header-top": TrackerHeader
+    }
+  },
+  {
+    path: "/load",
+    name: "load",
+    components: {
+      "header-top": TrackerHeader
+    }
+  },
+  {
+    path: "/options",
+    name: "options",
+    components: {
+      "header-top": TrackerHeader
+    }
+  },
+  {
+    path: "/mail",
+    name: "mail",
+    components: {
+      "header-top": TrackerHeader
+    }
+  },
+  {
+    path: "*",
+    redirect: "/"
   }
 ];
 
