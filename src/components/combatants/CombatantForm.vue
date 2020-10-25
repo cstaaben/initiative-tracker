@@ -144,7 +144,9 @@ export default {
         v =>
           (v && v >= 0) || "Initiative score must be greater than or equal to 0"
       ],
-      armorClass: [v => (v && v >= 0) || "Armor class must be greater than or equal to 0"],
+      armorClass: [
+        v => (v && v >= 0) || "Armor class must be greater than or equal to 0"
+      ],
       currentHP: [v => (v && v >= 0) || "Current HP must be at least 0"],
       passPerception: [
         v => (v && v >= 5) || "Passive perception must be at least 5"

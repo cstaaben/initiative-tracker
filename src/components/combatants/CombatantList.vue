@@ -7,9 +7,9 @@
             ><v-icon v-text="icons.combatants"></v-icon
           ></v-list-item-avatar>
           <v-list-item-content
-            ><v-list-item-title class="headline mb-1"
-              >{{ title }}</v-list-item-title
-            ></v-list-item-content
+            ><v-list-item-title class="headline mb-1">{{
+              title
+            }}</v-list-item-title></v-list-item-content
           >
         </v-list-item>
       </v-card-title>
@@ -82,7 +82,7 @@
               <td>
                 <tracker-tooltip-btn
                   :btn-class="'info'"
-                  :click-action="function() { editCombatant(combatant.id); }"
+                  :click-action="editCombatant(combatant.id)"
                   :icon="icons.edit"
                   :showing="true"
                   >Edit Combatant</tracker-tooltip-btn
