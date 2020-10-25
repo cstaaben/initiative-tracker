@@ -1,11 +1,11 @@
 <template>
   <v-app>
-    <v-content class="background: blue lighten-3">
+    <v-main class="background: blue lighten-3">
       <router-view name="header-top"></router-view>
       <transition name="slide" mode="out-in">
         <router-view></router-view>
       </transition>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

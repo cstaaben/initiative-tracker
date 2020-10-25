@@ -70,7 +70,11 @@
                     max-width="500"
                   >
                     <template #activator="{ on }">
-                      <v-btn @click="setDialogTarget(combatant)" v-on="on" small
+                      <v-btn
+                        @click="setDialogTarget(combatant)"
+                        v-on="on"
+                        small
+                        :disabled="!encounter.started"
                         ><v-icon small v-text="icons.pencil"></v-icon
                       ></v-btn>
                     </template>
@@ -372,6 +376,9 @@ export default {
       this.dialogs.hp.combatant = combatant;
     },
     modifyHP(modifier) {
+      if (isNaN(modifier) || modifier == null) {
+        return;
+      }
       this.dialogs.hp.combatant.currentHP += parseInt(modifier);
       this.dialogs.hp.show = false;
       this.dialogs.hp.modifier = null;
