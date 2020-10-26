@@ -19,7 +19,7 @@
           <v-text-field
             type="text"
             label="Encounter Name"
-            v-model="encounter.title"
+            v-model="encounterTitle"
             :disabled="!editTitle"
             shaped
             outlined
@@ -70,7 +70,7 @@
 
           <tbody>
             <tr
-              v-for="(combatant, i) in encounter.combatants"
+              v-for="(combatant, i) in combatants"
               :key="combatant.id"
               :class="{ stripe: i % 2 == 0 }"
             >
@@ -142,9 +142,7 @@
         >
 
         <tracker-tooltip-btn
-          :showing="
-            encounter.combatants.length > 0 || encounter.title.length > 0
-          "
+          :showing="combatants.length > 0 || encounterTitle.length > 0"
           :click-action="function() {}"
           :btn-class="'primary'"
           :icon="icons.save"
@@ -175,6 +173,7 @@ import {
   mdiPlus,
   mdiDelete
 } from "@mdi/js";
+import { mapGetters, mapActions } from "vuex";
 import TrackerTooltipBtn from "../tracker/TrackerTooltipBtn.vue";
 
 export default {
@@ -219,13 +218,26 @@ export default {
         this.dialogs.removeConfirmation.targetIndex
       ].name;
     },
-    encounterTitle() {
-      return this.encounter.title.length > 0
-        ? this.encounter.title
-        : " the encounter";
-    }
+    // encounterTitle() {
+    //   return this.encounter.title.length > 0
+    //     ? this.encounter.title
+    //     : " the encounter";
+    // },
+    ...mapGetters({
+      encounterTitle: "getTitle",
+      combatants: "getCombatants"
+    })
   },
   methods: {
+    ...mapActions([
+      "toggleStarted",
+      "incrementRound",
+      "decrementRound",
+      "incrementTurn",
+      "decrementTurn",
+      "addCombatant",
+      "removeCombatant"
+    ]),
     initTestCombatants() {
       if (this.encounter.combatants.length > 0) {
         return;
