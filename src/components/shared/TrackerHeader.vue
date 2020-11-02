@@ -23,6 +23,23 @@
             ></v-list-item-icon>
             <v-list-item-title>{{ optPage.title }}</v-list-item-title>
           </v-list-item>
+          <v-list-item key="Add Test Combatants" link @click="addTestCombatants"
+            ><v-list-item-icon
+              ><v-icon v-text="icons.addTest"></v-icon></v-list-item-icon
+            ><v-list-item-title
+              >Add Test Combatants</v-list-item-title
+            ></v-list-item
+          >
+          <v-list-item
+            key="Remove Test Combatants"
+            link
+            @click="setCombatants([])"
+            ><v-list-item-icon
+              ><v-icon v-text="icons.removeTest"></v-icon></v-list-item-icon
+            ><v-list-item-title
+              >Remove Test Combatants</v-list-item-title
+            ></v-list-item
+          >
         </v-list>
       </v-menu>
     </v-app-bar>
@@ -51,18 +68,26 @@
 </template>
 
 <script>
-import { mdiFormatListNumbered } from "@mdi/js";
-import { mdiAccountGroup } from "@mdi/js";
-import { mdiContentSave } from "@mdi/js";
-import { mdiCloudUploadOutline } from "@mdi/js";
-import { mdiHome } from "@mdi/js";
-import { mdiDotsVertical } from "@mdi/js";
-import { mdiEmail } from "@mdi/js";
-import { mdiSettings } from "@mdi/js";
+import {
+  mdiFormatListNumbered,
+  mdiAccountGroup,
+  mdiContentSave,
+  mdiCloudUploadOutline,
+  mdiHome,
+  mdiDotsVertical,
+  mdiEmail,
+  mdiSettings,
+  mdiPlusBox,
+  mdiMinusBox
+} from "@mdi/js";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "TrackerHeader",
   data: () => ({
+    ...mapGetters({
+      combatants: "getCombatants"
+    }),
     menuShowing: false,
     activePage: "Initiative Tracker",
     pages: [
@@ -110,9 +135,35 @@ export default {
       }
     ],
     icons: {
-      options: mdiDotsVertical
+      options: mdiDotsVertical,
+      addTest: mdiPlusBox,
+      removeTest: mdiMinusBox
     }
-  })
+  }),
+  methods: {
+    ...mapActions(["setTitle", "addCombatant", "setCombatants"]),
+    addTestCombatants() {
+      if (this.combatants.length > 0) {
+        return;
+      }
+
+      this.setTitle("Test Encounter");
+
+      for (let i = 0; i < 8; i++) {
+        let c = {
+          name: "Combatant " + (i + 1),
+          initiative: Math.floor(Math.random() * Math.floor(30)),
+          currentHP: 50,
+          armorClass: 18,
+          passPerception: 15,
+          dexterity: Math.floor(Math.random() * Math.floor(20)),
+          id: "combatant" + (i + 1)
+        };
+
+        this.addCombatant(c);
+      }
+    }
+  }
 };
 </script>
 

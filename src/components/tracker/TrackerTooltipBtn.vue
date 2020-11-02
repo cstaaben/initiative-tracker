@@ -1,7 +1,11 @@
 <template>
   <v-tooltip top>
     <template v-slot:activator="{ on }">
-      <v-btn @click="clickAction" :class="btnClass" v-on="on" v-show="showing"
+      <v-btn
+        @click="$emit('click')"
+        :class="btnClass"
+        v-on="on"
+        v-show="showing"
         ><v-icon v-text="icon"></v-icon
       ></v-btn>
     </template>
@@ -12,7 +16,7 @@
 <script>
 export default {
   name: "TrackerTooltipBtn",
-  props: ["icon", "showing", "clickAction", "btnClass"]
+  props: ["icon", "showing", "btnClass"]
 };
 </script>
 
