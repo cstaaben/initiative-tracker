@@ -91,8 +91,8 @@
                   color="success"
                   class="mr-4"
                   type="submit"
-                  @click.stop="addCombatant"
-                  >Add Combatant</v-btn
+                  @click.stop="submitForm"
+                  >{{ submitBtnText }}</v-btn
                 >
 
                 <v-btn color="error" class="mr-4" @click.stop="resetForm"
@@ -118,25 +118,39 @@ import { mdiAccount } from "@mdi/js";
 
 export default {
   name: "CombatantForm",
+  props: {
+    id: { type: String, default: "none" }
+  },
+  created() {
+    if (this.$route.params.id != null) {
+      this.combatant = this.$store.getters.getCombatants.find(
+        c => c.id === this.$route.params.id
+      );
+      this.submitFn = "updateCombatant";
+    }
+  },
   data: () => ({
     defaults: {
       icon: mdiAccount,
       title: "Combatant Form"
     },
-    validForm: false,
     combatant: {
       name: "",
       initiative: null,
       armorClass: null,
       currentHP: null,
       passPerception: null,
-      dexterity: null
+      dexterity: null,
+      id: null
     },
+    validForm: false,
+    submitBtnText: "Save Combatant",
+    submitFn: "addCombatant",
     rules: {
       name: [
         v => !!v || "Name is required",
         v =>
-          (v && v.indexOf('"') == -1) ||
+          (v && v.indexOf('"') === -1) ||
           "Use single quotes instead of double quotes"
       ],
       initiative: [
@@ -154,9 +168,19 @@ export default {
       dexterity: [v => (v && v > 0) || "Dexterity score must be above 0"]
     }
   }),
+  computed: {
+    combatantId() {
+      return this.combatant.name
+        .toLowerCase()
+        .split(" ")
+        .join("");
+    }
+  },
   methods: {
-    addCombatant() {
-      console.log("TODO: add combatant");
+    submitForm() {
+      this.combatant.id = this.combatantId; // update id used for matching combatants
+      this.$store.dispatch(this.submitFn, this.combatant); // submit the combatant to add/update
+      this.$router.push({ name: "encounter" }); // go back to the encounter page
     },
     resetForm() {
       this.$refs.combatantForm.reset();

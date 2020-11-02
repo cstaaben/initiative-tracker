@@ -19,7 +19,7 @@
           <v-text-field
             type="text"
             label="Encounter Name"
-            v-model="encounter.title"
+            v-model="encounterTitle"
             :disabled="!editTitle"
             shaped
             outlined
@@ -28,7 +28,7 @@
           <v-text-field
             type="number"
             label="Starting Round"
-            v-model="encounter.round"
+            v-model="encounterRound"
             :disabled="!editTitle"
             shaped
             outlined
@@ -39,7 +39,7 @@
         <v-flex class="d-sm-inline-flex">
           <tracker-tooltip-btn
             :showing="!editTitle"
-            :click-action="toggleEditTitle"
+            @click="toggleEditTitle"
             :icon="icons.edit"
             :btn-class="'info'"
             >Edit Details</tracker-tooltip-btn
@@ -47,7 +47,7 @@
 
           <tracker-tooltip-btn
             :showing="editTitle"
-            :click-action="toggleEditTitle"
+            @click="toggleEditTitle"
             :btn-class="'success'"
             :icon="icons.check"
             >Set Details</tracker-tooltip-btn
@@ -55,7 +55,7 @@
         </v-flex>
 
         <v-simple-table
-          v-if="encounter.combatants.length > 0"
+          v-if="combatants.length > 0"
           height="475px"
           fixed-header
         >
@@ -70,9 +70,9 @@
 
           <tbody>
             <tr
-              v-for="(combatant, i) in encounter.combatants"
+              v-for="(combatant, i) in combatants"
               :key="combatant.id"
-              :class="{ stripe: i % 2 == 0 }"
+              :class="{ stripe: i % 2 === 0 }"
             >
               <td>{{ combatant.name }}</td>
               <td>{{ combatant.initiative }}</td>
@@ -82,7 +82,7 @@
               <td>
                 <tracker-tooltip-btn
                   :btn-class="'info'"
-                  :click-action="editCombatant(combatant.id)"
+                  @click="editCombatant(combatant.id)"
                   :icon="icons.edit"
                   :showing="true"
                   >Edit Combatant</tracker-tooltip-btn
@@ -97,7 +97,7 @@
                     <v-tooltip top v-on="on">
                       <template #activator="{ on }">
                         <v-btn
-                          @click="toggleAndSetRemoveTarget(i)"
+                          @click="toggleAndSetRemoveTarget(combatant.id)"
                           class="error"
                           v-on="on"
                           ><v-icon v-text="icons.delete"></v-icon
@@ -113,7 +113,7 @@
                     </v-card-title>
 
                     <v-card-text>
-                      <v-btn dark text color="success" @click="removeCombatant"
+                      <v-btn dark text color="success" @click="removeTarget"
                         >Yes</v-btn
                       >
                       <v-btn dark text color="error" @click="toggleRemoveDialog"
@@ -135,27 +135,22 @@
       <v-card-actions class="justify-center">
         <tracker-tooltip-btn
           :showing="true"
-          :click-action="navigateToAddCombatant"
+          @click="navigateToAddCombatant"
           :btn-class="'success'"
           :icon="icons.plus"
           >Add Combatant</tracker-tooltip-btn
         >
 
         <tracker-tooltip-btn
-          :showing="
-            encounter.combatants.length > 0 || encounter.title.length > 0
-          "
-          :click-action="function() {}"
+          :showing="combatants.length > 0 || encounterTitle.length > 0"
+          @click="saveEncounter"
           :btn-class="'primary'"
           :icon="icons.save"
           >Save Encounter</tracker-tooltip-btn
         >
 
         <tracker-tooltip-btn
-          :showing="
-            encounter.combatants.length == 0 && encounter.title.length == 0
-          "
-          :click-action="function() {}"
+          @click="loadEncounter"
           :btn-class="'primary'"
           :icon="icons.load"
           >Load Encounter</tracker-tooltip-btn
@@ -175,6 +170,7 @@ import {
   mdiPlus,
   mdiDelete
 } from "@mdi/js";
+import { mapGetters, mapActions } from "vuex";
 import TrackerTooltipBtn from "../tracker/TrackerTooltipBtn.vue";
 
 export default {
@@ -194,92 +190,86 @@ export default {
       delete: mdiDelete
     },
     dataHeaders: ["Name", "Initiative", "HP", "AC", "Passive Perception"],
-    encounter: {
-      title: "",
-      started: false,
-      round: null,
-      currentTurn: 0,
-      combatants: []
-    },
     editTitle: false,
     dialogs: {
       removeConfirmation: {
-        targetIndex: -1,
+        targetId: -1,
         showing: false
       }
     }
   }),
   computed: {
     removeTargetName() {
-      if (this.dialogs.removeConfirmation.targetIndex < 0) {
+      if (this.dialogs.removeConfirmation.targetId === "") {
         return "";
       }
-
-      return this.encounter.combatants[
-        this.dialogs.removeConfirmation.targetIndex
-      ].name;
+      return this.combatants.find(
+        c => c.id === this.dialogs.removeConfirmation.targetId
+      ).name;
     },
-    encounterTitle() {
-      return this.encounter.title.length > 0
-        ? this.encounter.title
-        : " the encounter";
-    }
+    encounterRound: {
+      get() {
+        return this.getRoundNum;
+      },
+      set(round) {
+        this.setRound(round);
+      }
+    },
+    ...mapGetters({
+      encounterTitle: "getTitle",
+      combatants: "getCombatants",
+      roundNum: "getRoundNum"
+    })
   },
   methods: {
-    initTestCombatants() {
-      if (this.encounter.combatants.length > 0) {
-        return;
-      }
-
-      for (let i = 0; i < 8; i++) {
-        let name = "Combatant " + (i + 1);
-        let c = {
-          name: name,
-          initiative: Math.floor(Math.random() * Math.floor(30)),
-          currentHP: 50,
-          armorClass: 18,
-          passPerception: 15,
-          dexterity: Math.floor(Math.random() * Math.floor(20)),
-          id: name
-            .toLowerCase()
-            .split(" ")
-            .join("")
-        };
-
-        this.encounter.combatants.push(c);
-      }
-    },
+    ...mapActions([
+      "toggleStarted",
+      "incrementRound",
+      "decrementRound",
+      "incrementTurn",
+      "decrementTurn",
+      "addCombatant",
+      "removeCombatant",
+      "setRound"
+    ]),
     toggleRemoveDialog() {
       this.dialogs.removeConfirmation.showing = !this.dialogs.removeConfirmation
         .showing;
     },
-    setRemoveTarget(index) {
-      this.dialogs.removeConfirmation.targetIndex = index;
+    setRemoveTarget(id) {
+      this.dialogs.removeConfirmation.targetId = id;
     },
-    toggleAndSetRemoveTarget(index) {
+    toggleAndSetRemoveTarget(id) {
       this.toggleRemoveDialog();
-      this.setRemoveTarget(index);
+      this.setRemoveTarget(id);
     },
-    removeCombatant() {
-      if (this.dialogs.removeConfirmation.targetIndex == -1) {
+    removeTarget() {
+      if (this.dialogs.removeConfirmation.targetId === "") {
         return;
       }
 
-      this.encounter.combatants.splice(
-        this.dialogs.removeConfirmation.targetIndex,
-        1
-      );
-
+      this.removeCombatant(this.dialogs.removeConfirmation.targetId);
       this.toggleRemoveDialog();
     },
     toggleEditTitle() {
       this.editTitle = !this.editTitle;
     },
     editCombatant(id) {
-      console.log("TODO: navigate to edit combatant " + id);
+      this.$router.push({
+        name: "edit-combatant",
+        params: {
+          id
+        }
+      });
     },
     navigateToAddCombatant() {
       this.$router.push({ name: "add-combatant" });
+    },
+    saveEncounter() {
+      console.log("Save Encounter");
+    },
+    loadEncounter() {
+      console.log("Load Encounter");
     }
   }
 };

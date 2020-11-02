@@ -8,17 +8,6 @@
     </v-snackbar>
 
     <v-card outlined elevation="1" class="mx-auto">
-      <v-toolbar elevation="0">
-        <v-btn class="primary" @click="initTestCombatants"
-          >Add Test Combatants</v-btn
-        >
-        <v-btn
-          class="error"
-          @click="encounter.combatants = []"
-          v-if="encounter.combatants.length > 0"
-          >Remove Combatants</v-btn
-        >
-      </v-toolbar>
       <v-card-title>
         <v-list-item two-line>
           <v-list-item-avatar left
@@ -26,10 +15,10 @@
           ></v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title class="headline mb-1">{{
-              encounter.title
+              encounterTitle
             }}</v-list-item-title>
             <v-list-item-subtitle
-              >Round: {{ encounter.round }} <br />
+              >Round: {{ roundNum }} <br />
               Time Passed: {{ timePassed }}</v-list-item-subtitle
             >
           </v-list-item-content>
@@ -37,7 +26,7 @@
       </v-card-title>
       <v-card-text>
         <v-simple-table
-          v-if="encounter.combatants.length > 0"
+          v-if="combatants.length > 0"
           fixed-header
           height="475px"
         >
@@ -50,11 +39,11 @@
           </thead>
           <tbody>
             <tr
-              v-for="(combatant, i) in encounter.combatants"
+              v-for="(combatant, i) in combatants"
               :key="combatant.id"
               :class="{
-                yellow: encounter.currentTurn == i && encounter.started,
-                'accent-3': encounter.currentTurn == i && encounter.started
+                yellow: currentTurn === i && isStarted,
+                'accent-3': currentTurn === i && isStarted
               }"
             >
               <td>{{ combatant.name }}</td>
@@ -74,7 +63,7 @@
                         @click="setDialogTarget(combatant)"
                         v-on="on"
                         small
-                        :disabled="!encounter.started"
+                        :disabled="!isStarted"
                         ><v-icon small v-text="icons.pencil"></v-icon
                       ></v-btn>
                     </template>
@@ -136,17 +125,17 @@
       <v-card-actions>
         <v-flex class="justify-center d-inline-flex">
           <tracker-tooltip-btn
-            :showing="encounter.started"
+            :showing="isStarted"
             :btn-class="'info'"
-            :click-action="previousTurn"
+            @click="previousTurn"
             :icon="icons.prevRound"
             >Previous Turn</tracker-tooltip-btn
           >
 
           <tracker-tooltip-btn
-            :click-action="startEncounter"
+            @click="startEncounter"
             :btn-class="'success'"
-            :showing="!encounter.started"
+            :showing="!isStarted"
             :icon="icons.play"
             >Start Encounter</tracker-tooltip-btn
           >
@@ -154,9 +143,9 @@
           <v-dialog persistent v-model="dialogs.endCombat.show" max-width="350">
             <template #activator="{ on }">
               <tracker-tooltip-btn
-                :click-action="stopEncounter"
+                @click="stopEncounter"
                 :icon="icons.stop"
-                :showing="encounter.started"
+                :showing="isStarted"
                 :btn-class="'error'"
                 >Stop Encounter</tracker-tooltip-btn
               >
@@ -199,8 +188,8 @@
 
           <tracker-tooltip-btn
             :btn-class="'info'"
-            :click-action="nextTurn"
-            :showing="encounter.started"
+            @click="nextTurn"
+            :showing="isStarted"
             :icon="icons.nextRound"
             >Next Turn</tracker-tooltip-btn
           >
@@ -224,6 +213,7 @@ import {
   mdiPlus,
   mdiMinus
 } from "@mdi/js";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "Tracker",
@@ -255,42 +245,17 @@ export default {
         preserveRoundTurn: true
       }
     },
-    encounter: {
-      title: "Encounter",
-      started: false,
-      round: 0,
-      currentTurn: 0,
-      combatants: []
-    },
     dataHeaders: ["Name", "Initiative", "HP", "AC", "Passive Perception"]
   }),
   computed: {
-    timePassed() {
-      let seconds =
-        this.encounter.round <= 1 ? 0 : (this.encounter.round - 1) * 6;
-      let minutes = Math.floor(seconds / 60);
-      let secRem = Math.floor(seconds % 60);
-
-      if (isNaN(minutes)) {
-        minutes = "0";
-      } else {
-        minutes = "" + minutes;
-      }
-      if (isNaN(secRem)) {
-        secRem = "0";
-      } else {
-        secRem = "" + secRem;
-      }
-
-      if (minutes.length == 1) {
-        minutes = "0" + minutes;
-      }
-      if (secRem.length == 1) {
-        secRem = "0" + secRem;
-      }
-
-      return minutes + ":" + secRem;
-    },
+    ...mapGetters({
+      combatants: "getCombatants",
+      timePassed: "getTimePassed",
+      roundNum: "getRoundNum",
+      encounterTitle: "getTitle",
+      currentTurn: "getCurrentTurn",
+      isStarted: "isStarted"
+    }),
     getDialogTargetName() {
       return this.dialogs.hp.combatant == null
         ? ""
@@ -298,79 +263,32 @@ export default {
     }
   },
   methods: {
-    initTestCombatants() {
-      if (this.encounter.combatants.length > 0) {
-        return;
-      }
-
-      this.encounter.title = "Test Encounter";
-
-      for (let i = 0; i < 8; i++) {
-        let c = {
-          name: "Combatant " + (i + 1),
-          initiative: Math.floor(Math.random() * Math.floor(30)),
-          currentHP: 50,
-          armorClass: 18,
-          passPerception: 15,
-          dexterity: Math.floor(Math.random() * Math.floor(20)),
-          id: "combatant" + (i + 1)
-        };
-
-        this.encounter.combatants.push(c);
-      }
-
-      this.encounter.combatants.sort(this.compareCombatants);
-    },
-    compareCombatants(a, b) {
-      if (a.initiative < b.initiative) {
-        return 1;
-      } else if (a.initiative > b.initiative) {
-        return -1;
-      }
-
-      // initiative score is equal, compare dexterity scores
-      if (a.dexterity < b.dexterity) {
-        return 1;
-      } else if (a.dexterity > b.dexterity) {
-        return -1;
-      }
-
-      return 0;
-    },
+    ...mapActions({
+      incrementRound: "incrementRound",
+      decrementRound: "decrementRound",
+      setRound: "setRound",
+      nextTurn: "incrementTurn",
+      previousTurn: "decrementTurn",
+      setCurrentTurn: "setCurrentTurn",
+      toggleStarted: "toggleStarted",
+      setTitle: "setTitle",
+      addCombatant: "addCombatant",
+      updateCombatant: "updateCombatant",
+      setCombatants: "setCombatants"
+    }),
     startEncounter() {
-      if (this.encounter.combatants.length == 0) {
+      if (this.combatants.length === 0) {
         this.noCombatantsSnackbar = true;
         return;
-      } else if (!this.encounter.started && this.encounter.round == 0) {
-        this.encounter.round = 1;
+      } else if (!this.isStarted && this.roundNum === 0) {
+        this.incrementRound();
       }
 
-      this.encounter.started = true;
+      this.toggleStarted();
     },
     stopEncounter() {
-      this.encounter.started = false;
+      this.toggleStarted();
       this.dialogs.endCombat.show = true;
-    },
-    previousTurn() {
-      if (this.encounter.currentTurn == 0 && this.encounter.round == 0) {
-        return;
-      }
-
-      if (this.encounter.currentTurn == 0) {
-        this.encounter.currentTurn = this.encounter.combatants.length - 1;
-        this.encounter.round--;
-      }
-
-      this.encounter.currentTurn--;
-    },
-    nextTurn() {
-      if (this.encounter.currentTurn == this.encounter.combatants.length - 1) {
-        this.encounter.currentTurn = 0;
-        this.encounter.round++;
-        return;
-      }
-
-      this.encounter.currentTurn++;
     },
     setDialogTarget(combatant) {
       this.dialogs.hp.combatant = combatant;
@@ -382,10 +300,12 @@ export default {
       this.dialogs.hp.combatant.currentHP += parseInt(modifier);
       this.dialogs.hp.show = false;
       this.dialogs.hp.modifier = null;
+
+      this.updateCombatant(this.dialogs.hp.combatant);
     },
     resetRoundAndTurn() {
-      this.encounter.round = 0;
-      this.encounter.currentTurn = 0;
+      this.setRound(0);
+      this.setCurrentTurn(0);
       this.dialogs.endCombat.show = false;
     },
     saveEncounter() {

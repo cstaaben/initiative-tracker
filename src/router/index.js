@@ -39,15 +39,19 @@ const routes = [
     components: {
       "header-top": TrackerHeader,
       default: CombatantForm
+    },
+    props: {
+      id: null
     }
   },
   {
-    path: "/encounter/combatants/:id/edit",
+    path: "/encounter/combatants/:id/edit/",
     name: "edit-combatant",
     components: {
       "header-top": TrackerHeader,
       default: CombatantForm
-    }
+    },
+    props: true
   },
   {
     path: "/save",
